@@ -25,7 +25,11 @@ function isSignedAlready(req, res) {
   console.log(" A route has been called");
   const accesstoken = req.headers["accesstoken"];
   if (accesstoken) {
-    return res.redirect("/");
+    try {
+      const verified = jwt.verify(accesstoken, process.env.JWT_SECRET_KEY);
+      res.status(400).send("You are already signed in");
+      return;
+    } catch (err) {}
   }
 }
 function hashPass(data) {
@@ -114,17 +118,23 @@ router.post(
     const accesstoken = req.headers["accesstoken"]; // so we can get the accesstoken differently
 
     if (accesstoken) {
-      const verified = jwt.verify(accesstoken, process.env.JWT_SECRET_KEY);
-      const data = req.body;
-      //hash the password
-      hashPass(data);
-      userDB
-        .findOneAndUpdate({ id: verified?.id }, data)
-        .then((updatedUser) => {
-          return res
-            .status(200)
-            .send("User data has been successfully updated");
-        });
+      try {
+        const verified = jwt.verify(accesstoken, process.env.JWT_SECRET_KEY);
+        const data = req.body;
+        //hash the password
+        hashPass(data);
+        userDB
+          .findOneAndUpdate({ id: verified?.id }, data)
+          .then((updatedUser) => {
+            return res
+              .status(200)
+              .send("User data has been successfully updated");
+          });
+      } catch (err) {
+        return res
+          .status(400)
+          .send("You session has been expired, Login again please.");
+      }
     } else {
       return res
         .status(400)

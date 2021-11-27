@@ -73,8 +73,15 @@
             </ul>
             <ul>
               <li><b>POST</b> : /sign-up</li>
-              <li><b>POST</b> : /sign-in</li>
-              <li><b>POST</b> : /edit</li>
+              <li>
+                <b>POST</b> : /sign-in (returns an accessToken, use that in the
+                header everytime you call edit because that's how you will be
+                authenticated into the app)
+              </li>
+              <li>
+                <b>POST</b> : /edit (You must send the post request with a
+                header of accessToken that you get from signing in)
+              </li>
             </ul>
           </div>
         </div>
