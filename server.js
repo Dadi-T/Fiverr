@@ -2,7 +2,9 @@ require("dotenv/config");
 const express = require("express");
 const app = express();
 const signUpRouter = require("./routers/Sign-up");
-
+app.set("view engine", "ejs");
+app.use(express.static(__dirname + "/public"));
+app.set("views", [__dirname + "/views", __dirname + "/public"]);
 //Database
 const mongoose = require("mongoose");
 mongoose.connect(process.env.DB_URI, (err) => {
@@ -17,6 +19,6 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(signUpRouter);
 app.get("/", (req, res) => {
-  res.send("Welcome to the app");
+  res.render("index");
 });
 const server = app.listen(process.env.PORT || 3000);
