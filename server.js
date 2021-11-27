@@ -16,5 +16,7 @@ mongoose.connection.on("connected", function () {
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(signUpRouter);
-
+app.get("/", (req, res) => {
+  res.send("Welcome to the app");
+});
 const server = app.listen(process.env.PORT || 3000);
