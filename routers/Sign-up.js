@@ -39,6 +39,7 @@ function hashPass(data) {
 }
 
 //Routes
+//sign-up
 router.post(
   "/sign-up",
   usernameCheck(),
@@ -72,6 +73,7 @@ router.post(
   }
 );
 
+//POST Route =>Sign in
 router.post(
   "/sign-in",
   usernameCheck(),
@@ -108,7 +110,8 @@ router.post(
   }
 );
 
-router.post(
+//PUT Route => Edit user's data , user is being found using his json web token
+router.put(
   "/edit",
   usernameCheck(),
   emailCheck(),
@@ -142,5 +145,33 @@ router.post(
     }
   }
 );
+
+//Delete route => Delete user, user is being found using his json web token
+router.delete("/delete", async (req, res) => {
+  const accesstoken = req.headers["accesstoken"];
+  if (accesstoken) {
+    try {
+      const verified = jwt.verify(accesstoken, process.env.JWT_SECRET_KEY);
+      await userDB.deleteOne({ username: verified.username });
+      return;
+    } catch (err) {
+      return res.status(400).send("Error trying to delete user");
+    }
+  }
+});
+
+//Get route => All users
+router.get("/users", (req, res) => {
+  const accesstoken = req.headers["accesstoken"];
+  if (accesstoken) {
+    try {
+      const verified = jwt.verify(accesstoken, process.env.JWT_SECRET_KEY);
+      const users = await userDB.find({}).select({ username: 1 });
+      return res.status(200).send(users);
+    } catch (err) {
+      return res.status(400).send("Couldn't get users");
+    }
+  }
+});
 
 module.exports = router;
